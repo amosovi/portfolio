@@ -1,0 +1,10 @@
+[
+    { "location": "London,UK", "expected_status": 200, "expected_key": "latitude" },
+    { "location": "38.9697,-77.385", "expected_status": 200, "expected_key": "latitude" },
+    { "location": "InvalidLocation123", "expected_status": 400, "expected_key": "error" },
+    { "location": "", "expected_status": 400, "expected_key": "error" },
+    { "location": null, "expected_status": 400, "expected_key": "error" },
+    { "location": "SpecialCharacters@#$%", "expected_status": 400, "expected_key": "error" },
+    { "location": "90,180", "expected_status": 200, "expected_key": "latitude" },
+    { "location": "-90,-180", "expected_status": 200, "expected_key": "latitude" }
+]

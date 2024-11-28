@@ -1,0 +1,1907 @@
+{
+	"info": {
+    "_postman_id": "34f8e7ba-5022-4dc7-9a6d-4aa85d859822",
+    "name": "Weather API Tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "4443966",
+    "description": "### Weather API Tests Collection\n\n#### **Цель**\nКоллекция предназначена для проверки работы Weather API. Она включает функциональные и нефункциональные тесты, которые покрывают следующие аспекты:\n\n- Проверка корректности обработки различных типов запросов (например, поиск по городу, координатам, почтовым индексам).\n- Проверка граничных значений для дат, координат и других параметров.\n- Обработка ошибок для некорректных запросов (например, неверные ключи API, некорректные форматы дат).\n- Проверка производительности и соответствия времени ответа заявленным требованиям.\n- Тестирование специфичных для API сценариев, таких как использование диапазонов дат или динамических параметров (например, last30days).\n\n#### **Структура коллекции**\nКоллекция разделена на несколько разделов:\n\n1. **Current Weather**:\n   - Проверяет валидные и невалидные запросы для текущей погоды.\n2. **Historical Data**:\n   - Тесты для проверки истории погоды и работы с диапазонами дат.\n3. **Non Functional**:\n   - Нефункциональные тесты, такие как проверка производительности и обработка некорректных запросов.\n4. **Edge Cases**:\n   - Тесты для проверки граничных значений и неожиданных данных.\n5. **For Data Runner**:\n   - Динамические тесты, которые используют внешние файлы данных для автоматизации.\n\n#### **Используемые переменные**\nКоллекция опирается на следующие переменные:\n\n- `{{baseUrl}}` — базовый URL для запросов (например, `https://api.weather.com`).\n- `{{apiKey}}` — ключ API, используемый для аутентификации запросов.\n- `{{location}}` — параметр местоположения, используемый в различных запросах (например, `London,UK`, `51.5074,-0.1278`).\n- Дополнительные переменные, такие как `elements`, используются для уточнения параметров запросов.\n\n#### **Общие тесты**\nКоллекция использует библиотеку тестов (`testLibrary`) для выполнения часто повторяющихся проверок, таких как:\n- Проверка статуса ответа (`statusCodeIs`).\n- Проверка наличия ключей в ответе (`responseContainsKeys`).\n- Проверка валидности координат (`latitudeLongitudeAreNumbers`).\n- Проверка времени ответа (`responseTimeIsBelow`).\n\n#### **Как использовать**\n1. Убедитесь, что значения переменных `{{baseUrl}}` и `{{apiKey}}` установлены в соответствующих окружениях Postman.\n2. Запускайте папки или отдельные запросы в зависимости от сценария, который вы хотите протестировать.\n3. Для массового тестирования используйте раздел `For Data Runner`, добавляя данные в формате CSV для автоматизации.\n\n#### **Дополнительно**\nРекомендуется регулярно обновлять тесты, чтобы соответствовать изменениям в API. Добавляйте новые граничные случаи и корректируйте тесты на основе результатов выполнения."
+},
+	"item": [
+		{
+			"name": "Current Weather",
+			"item": [
+				{
+					"name": "Valid Location",
+					"item": [
+						{
+							"name": "City,Country",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Подключение общей библиотеки\r",
+											"testLibrary.statusCodeIs(200); \r",
+											"testLibrary.responseContainsKeys([\"latitude\", \"longitude\", \"days\"]); \r",
+											"testLibrary.latitudeLongitudeAreNumbers();\r",
+											"testLibrary.responseContainsLocation(\"London, UK\");\r",
+											"testLibrary.arrayIsNonEmpty([\"days\"]);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/London,UK?key={{apiKey}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"London,UK"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{apiKey}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "City",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"testLibrary.statusCodeIs(200); \r",
+											"testLibrary.responseContainsKeys([\"latitude\", \"longitude\", \"days\"]); \r",
+											"testLibrary.latitudeLongitudeAreNumbers();\r",
+											"testLibrary.responseContainsLocation(\"London\");\r",
+											"testLibrary.arrayIsNonEmpty([\"days\"]);\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/London?key={{apiKey}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"London"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{apiKey}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "City with simple error",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"testLibrary.statusCodeIs(200); \r",
+											"testLibrary.responseContainsKeys([\"latitude\", \"longitude\", \"days\"]); \r",
+											"testLibrary.latitudeLongitudeAreNumbers();\r",
+											"testLibrary.responseContainsLocation(\"London\");\r",
+											"testLibrary.arrayIsNonEmpty([\"days\"]);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/Landn?key={{apiKey}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"Landn"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{apiKey}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Current loc",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"testLibrary.statusCodeIs(200); \r",
+											"testLibrary.responseContainsKeys([\"latitude\", \"longitude\", \"days\"]); \r",
+											"testLibrary.latitudeLongitudeAreNumbers();\r",
+											"testLibrary.arrayIsNonEmpty([\"days\"]);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/current?key={{apiKey}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"current"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{apiKey}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Zip Code",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"testLibrary.statusCodeIs(200); \r",
+											"testLibrary.responseContainsKeys([\"latitude\", \"longitude\", \"days\"]); \r",
+											"testLibrary.latitudeLongitudeAreNumbers();\r",
+											"testLibrary.responseContainsLocation(\"New York\");\r",
+											"testLibrary.arrayIsNonEmpty([\"days\"]);\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/10001?key={{apiKey}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"10001"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{apiKey}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Coordinate",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"testLibrary.statusCodeIs(200); \r",
+											"testLibrary.responseContainsKeys([\"latitude\", \"longitude\", \"days\"]); \r",
+											"testLibrary.latitudeLongitudeAreNumbers();\r",
+											"testLibrary.responseContainsLocation(\"London\");\r",
+											"testLibrary.arrayIsNonEmpty([\"days\"]);\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/51.5074,-0.1278?key={{apiKey}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"51.5074,-0.1278"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{apiKey}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Min Coordinate",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"testLibrary.statusCodeIs(200); \r",
+											"testLibrary.responseContainsKeys([\"latitude\", \"longitude\", \"days\"]); \r",
+											"testLibrary.latitudeLongitudeAreNumbers();\r",
+											"testLibrary.arrayIsNonEmpty([\"days\"]);\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/-90,-180?key={{apiKey}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"-90,-180"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{apiKey}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Max Coordinate",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"testLibrary.statusCodeIs(200); \r",
+											"testLibrary.responseContainsKeys([\"latitude\", \"longitude\", \"days\"]); \r",
+											"testLibrary.latitudeLongitudeAreNumbers();\r",
+											"testLibrary.arrayIsNonEmpty([\"days\"]);\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/90,180?key={{apiKey}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"90,180"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{apiKey}}"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Invalid Location",
+					"item": [
+						{
+							"name": "Empty",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"testLibrary.statusCodeIs(400);\r",
+											"testLibrary.errorMessageIncludes(\"location\");\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/?key={{apiKey}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										""
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{apiKey}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Null",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"testLibrary.statusCodeIs(400);\r",
+											"testLibrary.errorMessageIncludes(\"location\");\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/null?key={{apiKey}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"null"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{apiKey}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "NotARealPlace",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"testLibrary.statusCodeIs(400);\r",
+											"testLibrary.errorMessageIncludes(\"not found\");\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/NotARealPlace?key={{apiKey}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"NotARealPlace"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{apiKey}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Random symbols",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"testLibrary.statusCodeIs(400);\r",
+											"testLibrary.errorMessageIncludes(\"invalid\");\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/!@#$%^&*()?key={{apiKey}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"!@"
+									],
+									"hash": "$%^&*()?key={{apiKey}}"
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Incorrect coordinate",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"testLibrary.statusCodeIs(400);\r",
+											"testLibrary.errorMessageIncludes(\"coordinates\");\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/-91,181?key={{apiKey}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"-91,181"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{apiKey}}"
+										},
+										{
+											"key": null,
+											"value": "",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "incomplete coordinates",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"testLibrary.statusCodeIs(400);\r",
+											"testLibrary.errorMessageIncludes(\"coordinates\");\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/90,?key={{apiKey}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"90,"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{apiKey}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "LongString",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"testLibrary.statusCodeIs(400);\r",
+											"testLibrary.errorMessageIncludes(\"too long\");\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/aVeryLongStringThatExceedsTypicalLengthForALocationInput?key={{apiKey}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"aVeryLongStringThatExceedsTypicalLengthForALocationInput"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{apiKey}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Invalid ZIP code",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"testLibrary.statusCodeIs(404);\r",
+											"testLibrary.errorMessageIncludes(\"not found\");\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/99999?key={{apiKey}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"99999"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{apiKey}}"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Historical Data",
+			"item": [
+				{
+					"name": "Valid Date Range",
+					"item": [
+						{
+							"name": "Without date",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"testLibrary.statusCodeIs(200);\r",
+											"testLibrary.responseContainsKeys([\"latitude\", \"longitude\", \"days\"]);\r",
+											"testLibrary.arrayIsNonEmpty([\"days\"]);\r",
+											"testLibrary.latitudeLongitudeAreNumbers();\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/London,UK?key={{apiKey}}&elements=tempmax,tempmin,temp",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"London,UK"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{apiKey}}"
+										},
+										{
+											"key": "elements",
+											"value": "tempmax,tempmin,temp"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Exactly time",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"testLibrary.statusCodeIs(200);\r",
+											"testLibrary.responseContainsKeys([\"latitude\", \"longitude\", \"days\"]);\r",
+											"testLibrary.arrayIsNonEmpty([\"days\"]);\r",
+											"testLibrary.responseContainsLocation(\"London, UK\");\r",
+											"testLibrary.responseTimeIsBelow(2000); // Проверяем, что время ответа не превышает 2 секунд\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/London,UK/2023-11-01T12:30:45?key={{apiKey}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"London,UK",
+										"2023-11-01T12:30:45"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{apiKey}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Today",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"testLibrary.statusCodeIs(200);\r",
+											"testLibrary.responseContainsKeys([\"latitude\", \"longitude\", \"days\"]);\r",
+											"testLibrary.responseContainsLocation(\"London, UK\");\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/London,UK/today?key={{apiKey}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"London,UK",
+										"today"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{apiKey}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Yesterday",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"testLibrary.statusCodeIs(200);\r",
+											"testLibrary.responseContainsKeys([\"latitude\", \"longitude\", \"days\"]);\r",
+											"testLibrary.arrayIsNonEmpty([\"days\"]);\r",
+											"testLibrary.responseContainsLocation(\"London, UK\");\r",
+											"\r",
+											"// Проверяем, что дата соответствует вчерашнему дню\r",
+											"const yesterday = new Date(Date.now() - 86400000).toISOString().split(\"T\")[0];\r",
+											"pm.test(\"Response contains yesterday's date\", function () {\r",
+											"    const jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.days[0].datetime).to.eql(yesterday);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/London,UK/yesterday?key={{apiKey}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"London,UK",
+										"yesterday"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{apiKey}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "One day",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"testLibrary.statusCodeIs(200);\r",
+											"testLibrary.responseContainsKeys([\"latitude\", \"longitude\", \"days\"]);\r",
+											"testLibrary.arrayIsNonEmpty([\"days\"]);\r",
+											"testLibrary.responseContainsLocation(\"London, UK\");\r",
+											"\r",
+											"// Проверяем, что возвращается только одна запись с правильной датой\r",
+											"const expectedDate = \"2023-11-01\";\r",
+											"pm.test(\"Response contains one day with correct date\", function () {\r",
+											"    const jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.days.length).to.eql(1);\r",
+											"    pm.expect(jsonData.days[0].datetime).to.eql(expectedDate);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/London,UK/2023-11-01?key={{apiKey}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"London,UK",
+										"2023-11-01"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{apiKey}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Range Dates",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"testLibrary.statusCodeIs(200);\r",
+											"testLibrary.responseContainsKeys([\"latitude\", \"longitude\", \"days\"]);\r",
+											"testLibrary.arrayIsNonEmpty([\"days\"]);\r",
+											"testLibrary.responseContainsLocation(\"London, UK\");\r",
+											"\r",
+											"// Проверяем, что даты в диапазоне корректны\r",
+											"const startDate = new Date(\"2023-11-01\");\r",
+											"const endDate = new Date(\"2023-11-10\");\r",
+											"pm.test(\"Dates are within the specified range\", function () {\r",
+											"    const jsonData = pm.response.json();\r",
+											"    jsonData.days.forEach(day => {\r",
+											"        const date = new Date(day.datetime);\r",
+											"        pm.expect(date).to.be.within(startDate, endDate);\r",
+											"    });\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/London,UK/2023-11-01/2023-11-10?key={{apiKey}}&elements=tempmax,tempmin,temp",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"London,UK",
+										"2023-11-01",
+										"2023-11-10"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{apiKey}}"
+										},
+										{
+											"key": "elements",
+											"value": "tempmax,tempmin,temp"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Range with time",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"testLibrary.statusCodeIs(200);\r",
+											"testLibrary.responseContainsKeys([\"latitude\", \"longitude\", \"days\"]);\r",
+											"testLibrary.arrayIsNonEmpty([\"days\"]);\r",
+											"testLibrary.responseContainsLocation(\"London, UK\");\r",
+											"\r",
+											"// Проверяем, что даты и время находятся в заданном диапазоне\r",
+											"const startDateTime = new Date(\"2023-11-01T12:30:45\");\r",
+											"const endDateTime = new Date(\"2023-11-02T15:45:00\");\r",
+											"pm.test(\"Dates and times are within the specified range\", function () {\r",
+											"    const jsonData = pm.response.json();\r",
+											"    jsonData.days.forEach(day => {\r",
+											"        const date = new Date(day.datetime);\r",
+											"        pm.expect(date).to.be.within(startDateTime, endDateTime);\r",
+											"    });\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/London,UK/2023-11-01T12:30:45/2023-11-02T15:45:00?key={{apiKey}}&elements=tempmax,tempmin,temp",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"London,UK",
+										"2023-11-01T12:30:45",
+										"2023-11-02T15:45:00"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{apiKey}}"
+										},
+										{
+											"key": "elements",
+											"value": "tempmax,tempmin,temp"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Dynamic range",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"testLibrary.statusCodeIs(200);\r",
+											"testLibrary.responseContainsKeys([\"latitude\", \"longitude\", \"days\"]);\r",
+											"testLibrary.arrayIsNonEmpty([\"days\"]);\r",
+											"testLibrary.responseContainsLocation(\"London, UK\");\r",
+											"\r",
+											"// Проверяем, что данные охватывают последние 30 дней\r",
+											"pm.test(\"Response contains last 30 days of data\", function () {\r",
+											"    const jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.days.length).to.eql(30);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/London,UK/last30days?key={{apiKey}}&elements=tempmax,tempmin,temp",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"London,UK",
+										"last30days"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{apiKey}}"
+										},
+										{
+											"key": "elements",
+											"value": "tempmax,tempmin,temp"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "UNIX format",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"testLibrary.statusCodeIs(200);\r",
+											"testLibrary.responseContainsKeys([\"latitude\", \"longitude\", \"days\"]);\r",
+											"testLibrary.arrayIsNonEmpty([\"days\"]);\r",
+											"testLibrary.responseContainsLocation(\"London, UK\");\r",
+											"\r",
+											"// Проверяем, что даты совпадают с диапазоном UNIX\r",
+											"const startUnix = 1698739200; // 1 ноября 2023\r",
+											"const endUnix = 1699344000; // 7 ноября 2023\r",
+											"pm.test(\"Response matches UNIX time range\", function () {\r",
+											"    const jsonData = pm.response.json();\r",
+											"    const responseStartDate = jsonData.days[0].datetimeEpoch;\r",
+											"    const responseEndDate = jsonData.days[jsonData.days.length - 1].datetimeEpoch;\r",
+											"    pm.expect(responseStartDate).to.eql(startUnix);\r",
+											"    pm.expect(responseEndDate).to.eql(endUnix);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/London,UK/1698739200/1699344000?key={{apiKey}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"London,UK",
+										"1698739200",
+										"1699344000"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{apiKey}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Last year",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"testLibrary.statusCodeIs(200);\r",
+											"testLibrary.responseContainsKeys([\"latitude\", \"longitude\", \"days\"]);\r",
+											"testLibrary.arrayIsNonEmpty([\"days\"]);\r",
+											"testLibrary.responseContainsLocation(\"London, UK\");\r",
+											"\r",
+											"// Проверяем, что данные соответствуют прошлому году\r",
+											"const lastYear = new Date(Date.now() - 31536000000).getFullYear();\r",
+											"pm.test(\"Response contains data for last year\", function () {\r",
+											"    const jsonData = pm.response.json();\r",
+											"    jsonData.days.forEach(day => {\r",
+											"        const year = new Date(day.datetime).getFullYear();\r",
+											"        pm.expect(year).to.eql(lastYear);\r",
+											"    });\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/London,UK/lastyear?key={{apiKey}}&elements=tempmax,tempmin,temp",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"London,UK",
+										"lastyear"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{apiKey}}"
+										},
+										{
+											"key": "elements",
+											"value": "tempmax,tempmin,temp"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Min date",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"testLibrary.statusCodeIs(200);\r",
+											"testLibrary.responseContainsKeys([\"latitude\", \"longitude\", \"days\"]);\r",
+											"testLibrary.arrayIsNonEmpty([\"days\"]);\r",
+											"testLibrary.responseContainsLocation(\"London, UK\");\r",
+											"\r",
+											"// Проверяем, что минимальная дата — 1 января 1950 года\r",
+											"const minDate = new Date(\"1950-01-01\");\r",
+											"pm.test(\"Response includes minimum boundary date (1950-01-01)\", function () {\r",
+											"    const jsonData = pm.response.json();\r",
+											"    jsonData.days.forEach(day => {\r",
+											"        const date = new Date(day.datetime);\r",
+											"        pm.expect(date).to.be.at.least(minDate);\r",
+											"    });\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/London,UK/1950-01-01?key={{apiKey}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"London,UK",
+										"1950-01-01"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{apiKey}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Max date",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"testLibrary.statusCodeIs(200);\r",
+											"testLibrary.responseContainsKeys([\"latitude\", \"longitude\", \"days\"]);\r",
+											"testLibrary.arrayIsNonEmpty([\"days\"]);\r",
+											"testLibrary.responseContainsLocation(\"London, UK\");\r",
+											"\r",
+											"// Проверяем, что максимальная дата — 31 декабря 2050 года\r",
+											"const maxDate = new Date(\"2050-12-31\");\r",
+											"pm.test(\"Response includes maximum boundary date (2050-12-31)\", function () {\r",
+											"    const jsonData = pm.response.json();\r",
+											"    jsonData.days.forEach(day => {\r",
+											"        const date = new Date(day.datetime);\r",
+											"        pm.expect(date).to.be.at.most(maxDate);\r",
+											"    });\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/London,UK/2050-12-31?key={{apiKey}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"London,UK",
+										"2050-12-31"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{apiKey}}"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Invalid Date Format",
+					"item": [
+						{
+							"name": "Incorrect date",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"testLibrary.statusCodeIs(400);\r",
+											"testLibrary.errorMessageIncludes(\"cannot be parsed\");\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/London,UK/2023-13-01?key={{apiKey}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"London,UK",
+										"2023-13-01"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{apiKey}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Incorrect format",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"testLibrary.statusCodeIs(400);\r",
+											"testLibrary.errorMessageIncludes(\"cannot be parsed\");\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/London,UK/01-12-2023/01-13-2023?key={{apiKey}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"London,UK",
+										"01-12-2023",
+										"01-13-2023"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{apiKey}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Date as text",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"testLibrary.statusCodeIs(400);\r",
+											"testLibrary.errorMessageIncludes(\"cannot be parsed\");\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/London,UK/invalidDate?key={{apiKey}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"London,UK",
+										"invalidDate"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{apiKey}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Incorrect UNIX TIme",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"testLibrary.statusCodeIs(400);\r",
+											"testLibrary.errorMessageIncludes(\"Years must be between 1950 and 2050\");\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/London,UK/99999999999/999999999999?key={{apiKey}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"London,UK",
+										"99999999999",
+										"999999999999"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{apiKey}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Switch date order",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"testLibrary.statusCodeIs(400);\r",
+											"testLibrary.errorMessageIncludes(\"Invalid date range\");\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/London,UK/2023-11-10/2023-11-01?key={{apiKey}}&elements=tempmax,tempmin,temp",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"London,UK",
+										"2023-11-10",
+										"2023-11-01"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{apiKey}}"
+										},
+										{
+											"key": "elements",
+											"value": "tempmax,tempmin,temp"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Too long Range",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"testLibrary.statusCodeIs(400);\r",
+											"testLibrary.errorMessageIncludes(\"Years must be between 1950 and 2050\");\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/London,UK/1000-01-01/3000-01-01?key={{apiKey}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"London,UK",
+										"1000-01-01",
+										"3000-01-01"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{apiKey}}"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Non Functional",
+			"item": [
+				{
+					"name": "Invalide API key",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"testLibrary.statusCodeIs(401);\r",
+									"testLibrary.errorMessageIncludes(\"No account found with API\");\r",
+									"testLibrary.responseContainsKeys([\"error\"]);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/London,UK?key=INVALID_KEY",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"London,UK"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "INVALID_KEY"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Without API key",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"testLibrary.statusCodeIs(401);\r",
+									"testLibrary.errorMessageIncludes(\"No API key or session found\");\r",
+									"testLibrary.responseContainsKeys([\"error\"]);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/London,UK",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"London,UK"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Performance test",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"testLibrary.statusCodeIs(200);\r",
+									"testLibrary.responseContainsKeys([\"latitude\", \"longitude\", \"days\"]);\r",
+									"testLibrary.arrayIsNonEmpty([\"days\"]);\r",
+									"testLibrary.responseTimeIsBelow(2000);\r",
+									"testLibrary.contentSizeIsBelow(5000000);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/London,UK/1950-01-01/2050-12-31?key={{apiKey}}&elements=tempmax,tempmin,temp",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"London,UK",
+								"1950-01-01",
+								"2050-12-31"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "{{apiKey}}"
+								},
+								{
+									"key": "elements",
+									"value": "tempmax,tempmin,temp"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Incorrect type request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"testLibrary.statusCodeIs(400);\r",
+									"testLibrary.errorMessageIncludes(\"Invalid method\");\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"location\": \"London,UK\",\r\n  \"date\": \"2023-11-01\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/London,UK?key={{apiKey}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"London,UK"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "{{apiKey}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "SQL injection",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"testLibrary.statusCodeIs(400);\r",
+									"testLibrary.errorMessageIncludes(\"Invalid request\");\r",
+									"testLibrary.responseContainsKeys([\"error\"]);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/London,UK'; DROP TABLE weather;--?key={{apiKey}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"London,UK'; DROP TABLE weather;--"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "{{apiKey}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invalide contentType",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"testLibrary.statusCodeIs(400);\r",
+									"testLibrary.errorMessageIncludes(\"Unsupported content type\");\r",
+									"testLibrary.responseContainsKeys([\"error\"]);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/London,UK?key={{apiKey}}&contentType=xml",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"London,UK"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "{{apiKey}}"
+								},
+								{
+									"key": "contentType",
+									"value": "xml"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Long City Name Request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"testLibrary.statusCodeIs(200);\r",
+									"testLibrary.responseContainsKeys([\"latitude\", \"longitude\", \"days\"]);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/ThisIsAVeryLongCityNameThatShouldBeTruncatedProperlyWithoutCausingErrors?key={{apiKey}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"ThisIsAVeryLongCityNameThatShouldBeTruncatedProperlyWithoutCausingErrors"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "{{apiKey}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "For Data Runner",
+			"item": [
+				{
+					"name": "Current Weather",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Получаем данные из текущего запроса\r",
+									"const expectedStatus = pm.iterationData.get(\"expected_status\");\r",
+									"const expectedKey = pm.iterationData.get(\"expected_key\");\r",
+									"const expectedLocation = pm.iterationData.get(\"expected_location\");\r",
+									"const responseTimeThreshold = 2000; // Максимальное время ответа, в миллисекундах\r",
+									"\r",
+									"// Используем общую библиотеку для тестирования\r",
+									"\r",
+									"// Проверяем статус ответа\r",
+									"testLibrary.statusCodeIs(parseInt(expectedStatus));\r",
+									"\r",
+									"// Проверяем, что ответ содержит ожидаемый ключ\r",
+									"if (expectedKey) {\r",
+									"    testLibrary.responseContainsKeys([expectedKey]);\r",
+									"}\r",
+									"\r",
+									"// Проверяем, что широта и долгота являются числами\r",
+									"testLibrary.latitudeLongitudeAreNumbers();\r",
+									"\r",
+									"// Проверяем, что адрес совпадает с ожидаемым (если задано)\r",
+									"if (expectedLocation) {\r",
+									"    testLibrary.responseContainsLocation(expectedLocation);\r",
+									"}\r",
+									"\r",
+									"// Проверяем, что время ответа меньше порога\r",
+									"testLibrary.responseTimeIsBelow(responseTimeThreshold);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{location}}?key={{apiKey}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{location}}"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "{{apiKey}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					"const testLibrary = {\r",
+					"    // Проверяет, что статус ответа совпадает с ожидаемым\r",
+					"    statusCodeIs: function(expectedCode) {\r",
+					"        pm.test(`Status code is ${expectedCode}`, function () {\r",
+					"            pm.response.to.have.status(expectedCode); // Сравнивает фактический статус ответа с ожидаемым\r",
+					"        });\r",
+					"    },\r",
+					"    // Проверяет, что JSON-ответ содержит заданные ключи\r",
+					"    responseContainsKeys: function(requiredKeys) {\r",
+					"        pm.test(\"Response contains required keys\", function () {\r",
+					"            const jsonData = pm.response.json(); // Преобразует тело ответа в объект JSON\r",
+					"            requiredKeys.forEach(key => {\r",
+					"                pm.expect(jsonData).to.have.property(key); // Проверяет наличие каждого ключа из массива\r",
+					"            });\r",
+					"        });\r",
+					"    },\r",
+					"    // Проверяет, что массив по заданному пути существует и не пустой\r",
+					"    arrayIsNonEmpty: function(arrayPath) {\r",
+					"        pm.test(\"Array is present and non-empty\", function () {\r",
+					"            const jsonData = pm.response.json(); // Получает JSON-ответ\r",
+					"            const array = arrayPath.reduce((obj, key) => obj[key], jsonData); // Навигация по вложенным объектам\r",
+					"            pm.expect(array).to.be.an(\"array\").that.is.not.empty; // Проверяет, что это массив и он не пустой\r",
+					"        });\r",
+					"    },\r",
+					"    // Проверяет, что значения широты и долготы являются числами\r",
+					"    latitudeLongitudeAreNumbers: function() {\r",
+					"        pm.test(\"Latitude and Longitude are valid numbers\", function () {\r",
+					"            const jsonData = pm.response.json(); // Получает JSON-ответ\r",
+					"            pm.expect(jsonData.latitude).to.be.a(\"number\"); // Проверяет, что latitude — число\r",
+					"            pm.expect(jsonData.longitude).to.be.a(\"number\"); // Проверяет, что longitude — число\r",
+					"        });\r",
+					"    },\r",
+					"    // Проверяет, что поле resolvedAddress в ответе содержит ожидаемое местоположение\r",
+					"    responseContainsLocation: function(expectedLocation) {\r",
+					"        pm.test(`Response resolves to ${expectedLocation}`, function () {\r",
+					"            const jsonData = pm.response.json(); // Получает JSON-ответ\r",
+					"            pm.expect(jsonData.resolvedAddress).to.include(expectedLocation); // Проверяет, что местоположение совпадает с ожидаемым\r",
+					"        });\r",
+					"    },\r",
+					"    // Проверяет, что время ответа меньше указанного порога\r",
+					"    responseTimeIsBelow: function(threshold) {\r",
+					"        pm.test(`Response time is below ${threshold} ms`, function () {\r",
+					"            pm.expect(pm.response.responseTime).to.be.below(threshold); // Проверяет время ответа\r",
+					"        });\r",
+					"    },\r",
+					"    // Проверяет, что размер ответа меньше указанного порога\r",
+					"    contentSizeIsBelow: function(threshold) {\r",
+					"        pm.test(`Response size is below ${threshold} bytes`, function () {\r",
+					"            const size = pm.response.headers.get(\"Content-Length\"); // Получает размер ответа из заголовков\r",
+					"            pm.expect(parseInt(size)).to.be.below(threshold); // Проверяет, что размер меньше порога\r",
+					"        });\r",
+					"    },\r",
+					"    // Проверяет, что ошибка присутствует и содержит ожидаемое сообщение\r",
+					"    errorMessageIncludes: function(expectedMessage) {\r",
+					"        pm.test(\"Error message is returned\", function () {\r",
+					"            const jsonData = pm.response.json(); // Получает JSON-ответ\r",
+					"            pm.expect(jsonData).to.have.property(\"error\"); // Проверяет, что свойство \"error\" существует\r",
+					"            pm.expect(jsonData.error).to.include(expectedMessage); // Проверяет, что сообщение об ошибке содержит ожидаемый текст\r",
+					"        });\r",
+					"    }\r",
+					"};\r",
+					""
+				]
+			}
+		}
+	]
+}
