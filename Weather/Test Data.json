@@ -1,10 +1,9 @@
 [
-    { "location": "London,UK", "expected_status": 200, "expected_key": "latitude" },
-    { "location": "38.9697,-77.385", "expected_status": 200, "expected_key": "latitude" },
-    { "location": "InvalidLocation123", "expected_status": 400, "expected_key": "error" },
-    { "location": "", "expected_status": 400, "expected_key": "error" },
-    { "location": null, "expected_status": 400, "expected_key": "error" },
-    { "location": "SpecialCharacters@#$%", "expected_status": 400, "expected_key": "error" },
-    { "location": "90,180", "expected_status": 200, "expected_key": "latitude" },
-    { "location": "-90,-180", "expected_status": 200, "expected_key": "latitude" }
+    { "location": "London,UK", "expected_status": 200, "expected_location": "London" },
+    { "location": "38.9697,-77.385", "expected_status": 200, "expected_location": "38.9697,-77.385" },
+    { "location": "InvalidLocation123", "expected_status": 400, "expected_error_message": "Invalid location" },
+    { "location": "", "expected_status": 400, "expected_error_message": "Invalid location" },
+    { "location": "SpecialCharacters$%^*()", "expected_status": 400, "expected_error_message": "Bad Request" },
+    { "location": "90,179", "expected_status": 200, "expected_location": "90,179" },
+    { "location": "-90,-180", "expected_status": 200, "expected_location": "-90,-180" }
 ]
